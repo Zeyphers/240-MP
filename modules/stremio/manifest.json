@@ -1,0 +1,63 @@
+{
+  "id": "com.240mp.stremio",
+  "name": "Stremio",
+  "icon": "assets/images/logo.svg",
+  "entry_point_qml": "views/Root.qml",
+  "settings": [
+    {
+      "key": "enabled",
+      "label": "Enabled",
+      "type": "toggle",
+      "default": "OFF"
+    },
+    {
+      "key": "account",
+      "label": "Account",
+      "type": "list_single",
+      "options_source": "dynamic",
+      "options_slot": "getAccounts",
+      "requires_auth": true
+    },
+    {
+      "key": "preferred_quality",
+      "label": "Preferred Quality",
+      "type": "list_single",
+      "options_source": "dynamic",
+      "options_slot": "getQualities",
+      "default": "any",
+      "requires_auth": true
+    },
+    {
+      "key": "subtitle_language",
+      "label": "Subtitle Language",
+      "type": "list_single",
+      "options_source": "dynamic",
+      "options_slot": "getSubtitleLanguages",
+      "default": "off",
+      "requires_auth": true
+    },
+    {
+      "key": "autoplay_next",
+      "label": "Autoplay Next Episode",
+      "type": "toggle",
+      "default": "ON",
+      "requires_auth": true
+    },
+    {
+      "key": "resume_playback",
+      "label": "Resume Playback",
+      "type": "list_single",
+      "options_source": "dynamic",
+      "options_slot": "get_resume_playback_options",
+      "default": "ask",
+      "requires_auth": true
+    },
+    {
+      "key": "logout",
+      "label": "Sign out",
+      "type": "action",
+      "action_slot": "logout",
+      "requires_auth": true
+    }
+  ]
+}

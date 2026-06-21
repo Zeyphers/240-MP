@@ -14,6 +14,12 @@
 #include "modules/local_files/LocalFilesBackend.h"
 #include "modules/plex/PlexBackend.h"
 #include "modules/ambient_mode/AmbientModeBackend.h"
+#include "modules/stremio/StremioBackend.h"
+#ifdef Q_OS_LINUX
+#include "modules/bluetooth/BluetoothBackend.h"
+#include "modules/bluetooth/ProjectMViz.h"
+#include <QtQml>
+#endif
 #include "player/MpvController.h"
 #include "input/InputManager.h"
 #ifdef Q_OS_MAC
@@ -52,15 +58,22 @@ int main(int argc, char *argv[]) {
     app.setApplicationName("240-MP");
     app.setApplicationVersion("2026.06.14");
 
+    // Dev affordance: MP_WINDOWED=1 keeps the app in a normal resizable window
+    // (no forced fullscreen, no hidden cursor/menu bar) so it can be driven and
+    // inspected during development. Default behaviour is unchanged.
+    const bool kWindowed = qEnvironmentVariableIsSet("MP_WINDOWED");
+
     // Hide cursor — 240-MP is keyboard-only so the cursor serves no purpose.
     // On Linux, only hide on headless EGLFS (not desktop X11/Wayland sessions).
 #ifdef Q_OS_LINUX
-    if (qgetenv("DISPLAY").isEmpty() && qgetenv("WAYLAND_DISPLAY").isEmpty())
+    if (!kWindowed && qgetenv("DISPLAY").isEmpty() && qgetenv("WAYLAND_DISPLAY").isEmpty())
         QGuiApplication::setOverrideCursor(Qt::BlankCursor);
 #endif
 #ifdef Q_OS_MAC
-    QGuiApplication::setOverrideCursor(Qt::BlankCursor);
-    hideMacOSMenuBar();
+    if (!kWindowed) {
+        QGuiApplication::setOverrideCursor(Qt::BlankCursor);
+        hideMacOSMenuBar();
+    }
     int macW = macMainScreenWidth();
     int macH = macMainScreenHeight();
     qDebug("[main] macOS NSScreen main frame: %dx%d", macW, macH);
@@ -79,6 +92,10 @@ int main(int argc, char *argv[]) {
     LocalFilesBackend   localFiles(appRoot, dataRoot);
     PlexBackend         plexBackend(appRoot, dataRoot);
     AmbientModeBackend  ambientMode(dataRoot);
+    StremioBackend      stremioBackend(appRoot, dataRoot);
+#ifdef Q_OS_LINUX
+    BluetoothBackend    bluetoothBackend(dataRoot);
+#endif
     MpvController       mpvController(appRoot);
     InputManager        inputManager(dataRoot);
 
@@ -94,6 +111,11 @@ int main(int argc, char *argv[]) {
     appCore.registerModule("com.240mp.local_files",  "localFilesBackend",  &localFiles,  ctx);
     appCore.registerModule("com.240mp.plex",         "plexBackend",        &plexBackend, ctx);
     appCore.registerModule("com.240mp.ambient_mode", "ambientModeBackend", &ambientMode, ctx);
+    appCore.registerModule("com.240mp.stremio",      "stremioBackend",     &stremioBackend, ctx);
+#ifdef Q_OS_LINUX
+    appCore.registerModule("com.240mp.bluetooth",    "bluetoothBackend",   &bluetoothBackend, ctx);
+    qmlRegisterType<ProjectMViz>("Bluetooth", 1, 0, "ProjectMViz");
+#endif
 
     ctx->setContextProperty("appCore",       &appCore);
     ctx->setContextProperty("mpvController", &mpvController);
@@ -120,9 +142,11 @@ int main(int argc, char *argv[]) {
     inputManager.setTargetWindow(qobject_cast<QQuickWindow *>(engine.rootObjects().first()));
 
 #ifdef Q_OS_MAC
-    if (QWindow *win = qobject_cast<QWindow *>(engine.rootObjects().first())) {
-        win->winId(); // ensure native NSWindow is created
-        forceWindowFullScreen(reinterpret_cast<void *>(win->winId()));
+    if (!kWindowed) {
+        if (QWindow *win = qobject_cast<QWindow *>(engine.rootObjects().first())) {
+            win->winId(); // ensure native NSWindow is created
+            forceWindowFullScreen(reinterpret_cast<void *>(win->winId()));
+        }
     }
 #endif
 

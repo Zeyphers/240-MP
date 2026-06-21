@@ -1,0 +1,111 @@
+{
+  "id": "com.240mp.bluetooth",
+  "name": "Bluetooth",
+  "icon": "assets/images/logo.svg",
+  "entry_point_qml": "views/Root.qml",
+  "settings": [
+    {
+      "key": "enabled",
+      "label": "Enabled",
+      "type": "toggle",
+      "default": "OFF"
+    },
+    {
+      "key": "auto_fullscreen",
+      "label": "Auto Fullscreen On Play",
+      "type": "toggle",
+      "default": "OFF"
+    },
+    {
+      "key": "disconnect_on_exit",
+      "label": "Disconnect On Exit",
+      "type": "toggle",
+      "default": "ON"
+    },
+    {
+      "key": "fs_default_style",
+      "label": "Default View",
+      "type": "list_single",
+      "options": ["Cover", "Shuffle", "Cycle"],
+      "default": "Shuffle"
+    },
+    {
+      "key": "visualizer_quality",
+      "label": "Visualizer Quality",
+      "type": "list_single",
+      "options": ["Performance", "Balanced", "Quality"],
+      "default": "Balanced"
+    },
+    {
+      "key": "milkdrop_preset_seconds",
+      "label": "Shuffle Interval (sec)",
+      "type": "list_single",
+      "options": ["10", "15", "20", "30", "45", "60", "120"],
+      "default": "20"
+    },
+    {
+      "key": "preset_blend",
+      "label": "Preset Blend",
+      "type": "list_single",
+      "options": ["Instant", "Fast", "Smooth", "Slow"],
+      "default": "Smooth"
+    },
+    {
+      "key": "visualizer_sensitivity",
+      "label": "Audio Sensitivity",
+      "type": "list_single",
+      "options": ["Low", "Medium", "High"],
+      "default": "Medium"
+    },
+    {
+      "key": "beat_switching",
+      "label": "Beat-Triggered Switching",
+      "type": "toggle",
+      "default": "OFF"
+    },
+    {
+      "key": "colored_background",
+      "label": "Tint Background To Album",
+      "type": "toggle",
+      "default": "ON"
+    },
+    {
+      "key": "album_art_scaling",
+      "label": "Album Art Scaling",
+      "type": "list_single",
+      "options": ["Fit", "Fill"],
+      "default": "Fit"
+    },
+    {
+      "key": "show_track_info",
+      "label": "Show Track Info",
+      "type": "toggle",
+      "default": "ON"
+    },
+    {
+      "key": "track_info_size",
+      "label": "Track Info Size",
+      "type": "list_single",
+      "options": ["Small", "Medium", "Large"],
+      "default": "Medium"
+    },
+    {
+      "key": "mode_flash",
+      "label": "Show View Name On Switch",
+      "type": "toggle",
+      "default": "ON"
+    },
+    {
+      "key": "show_playhead",
+      "label": "Show Progress Bar",
+      "type": "toggle",
+      "default": "ON"
+    },
+    {
+      "key": "clear_blacklist",
+      "label": "Reset Hidden Presets",
+      "type": "action",
+      "action_slot": "clear_preset_blacklist"
+    }
+  ]
+}

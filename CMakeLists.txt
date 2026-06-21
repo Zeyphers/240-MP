@@ -9,6 +9,12 @@ include(GNUInstallDirs)
 
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Quick Qml Network Svg)
 find_package(OpenSSL REQUIRED)
+
+# Qt D-Bus is used by the Bluetooth receiver module to talk to BlueZ (Linux only).
+# Qt OpenGL provides QOpenGLFramebufferObject for the projectM (MilkDrop) visualizer.
+if(NOT APPLE)
+    find_package(Qt6 REQUIRED COMPONENTS DBus OpenGL)
+endif()
 find_package(SDL2 CONFIG REQUIRED) # gamepad input (InputManager)
 
 # libdrm is used on Linux/RPi to save and restore the KMS CRTC state
@@ -16,6 +22,8 @@ find_package(SDL2 CONFIG REQUIRED) # gamepad input (InputManager)
 if(NOT APPLE)
     find_package(PkgConfig REQUIRED)
     pkg_check_modules(Libdrm REQUIRED libdrm)
+    # libprojectM (MilkDrop-compatible visualizer) for the Bluetooth module.
+    pkg_check_modules(ProjectM REQUIRED libprojectM)
 endif()
 
 if(APPLE)
@@ -28,6 +36,9 @@ add_executable(240mp
     src/modules/local_files/LocalFilesBackend.cpp
     src/modules/plex/PlexBackend.cpp
     src/modules/ambient_mode/AmbientModeBackend.cpp
+    src/modules/stremio/StremioBackend.cpp
+    $<$<NOT:$<BOOL:${APPLE}>>:src/modules/bluetooth/BluetoothBackend.cpp>
+    $<$<NOT:$<BOOL:${APPLE}>>:src/modules/bluetooth/ProjectMViz.cpp>
     src/player/MpvController.cpp
     src/input/InputManager.cpp
     $<$<BOOL:${APPLE}>:src/macos_utils.mm>
@@ -40,9 +51,12 @@ target_link_libraries(240mp PRIVATE
     Qt6::Qml
     Qt6::Network
     Qt6::Svg
+    $<$<NOT:$<BOOL:${APPLE}>>:Qt6::DBus>
+    $<$<NOT:$<BOOL:${APPLE}>>:Qt6::OpenGL>
     OpenSSL::Crypto
     SDL2::SDL2
     $<$<NOT:$<BOOL:${APPLE}>>:${Libdrm_LIBRARIES}>
+    $<$<NOT:$<BOOL:${APPLE}>>:${ProjectM_LIBRARIES}>
 )
 
 if(APPLE)
@@ -50,7 +64,8 @@ if(APPLE)
 endif()
 
 if(NOT APPLE)
-    target_include_directories(240mp PRIVATE ${Libdrm_INCLUDE_DIRS})
+    target_include_directories(240mp PRIVATE ${Libdrm_INCLUDE_DIRS} ${ProjectM_INCLUDE_DIRS})
+    target_link_directories(240mp PRIVATE ${ProjectM_LIBRARY_DIRS})
 endif()
 
 target_include_directories(240mp PRIVATE
