@@ -1,6 +1,6 @@
 <img src="https://github.com/user-attachments/assets/73c3e46f-a74a-4d96-9c4f-ae30f28378be" />
 
-# 240-MP
+# 240-MP — Stremio + Bluetooth fork
 
 240-MP is a retro VCR style frontend to play content on Raspberry Pi (preferably hooked up to a CRT TV). 
 
